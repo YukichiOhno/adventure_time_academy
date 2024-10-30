@@ -189,6 +189,84 @@ router.post('/sign-up/employee', async (req, res) => {
 });
 
 
+router.post('/login', async (req, res) => {
+    // initialize variables
+    const { username, password } = req.body;
+    let selectQuery;
+    let queryResult;
+    let retrievedLoginInformation;
+    let isPasswordValid;
+    let token;
+
+    // if username or password is not on the body, throw a user error
+    if (!username || !password) {
+        logger.error('username or password not found');
+        return res.status(400).json({ message: 'username or password not found' });
+    }
+
+    try {
+        // perform a read query on the database with account entity
+        selectQuery = "SELECT * FROM account WHERE account_username = ?";
+        queryResult = await executeReadQuery(selectQuery, [username]);
+
+        // ensure queryResult only responds with one account instance; otherwise throw a user or server error
+        if (queryResult.length > 1) {
+            logger.error('username MUST be unique: account_username constraint somehow did not work on this one');
+            return res.status(500).json({ message: 'username MUST be unique: account_username constraint somehow did not work on this one' });
+        } else if (queryResult.length < 1) {
+            logger.error('invalid username or password');
+            return res.status(400).json({ message: 'invalid username or password' });
+        } else {
+            retrievedLoginInformation = queryResult[0];
+        }
+
+        // compare requested password to userInformation password from the database
+        isPasswordValid = await bcrypt.compare(password, retrievedLoginInformation.account_password);
+        logger.debug(`password validation result: ${isPasswordValid}`, );
+        delete retrievedLoginInformation.account_password;
+
+        if (!isPasswordValid) {
+            logger.error('invalid password');
+            return res.status(400).json({ user_error: 'invalid password' });
+        }
+
+        // create a token
+        token = jwt.sign(retrievedLoginInformation, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        // set an http-only cookie using the provided token
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'Strict',
+            maxAge: 3600000 // 1 hour in milliseconds
+        });
+
+        // return userinformation aside from the password (which was deleted)
+        logger.debug('login success');
+        return res.status(200).json({ message: "login success", user_information: retrievedLoginInformation});
+
+    } catch (err) {
+        logger.error('an error occured during login');
+        logger.error(err);
+        return res.status(500).json({
+            message: "an error occured during login",
+            error: err
+        });
+    }
+});
+
+
+router.post('/logout', async(req, res) => {
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'Strict',
+      });
+    
+    res.status(200).json({ message: 'logout success'} );
+});
+
+
 router.get('/', async (req, res) => {
     let selectQuery;
     let resultQuery;
