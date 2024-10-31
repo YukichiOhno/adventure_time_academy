@@ -31,7 +31,7 @@ const router = createRouter({
                 if (!username && !identity && !number) {
                     next();
                 } else {
-                    router.push({ name: 'home' });
+                    next({ name: 'home' });
                 }
             }
         },

@@ -17,6 +17,13 @@ router.post('/sign-up/guide', async (req, res) => {
     const accountInformation = req.body.account;
     const guideInformation = req.body.guide;
     const guideInitial = guideInformation.initial ? guideInformation.initial.toLowerCase() : null;
+    const token = req.cookies['token'];
+
+    // if guide is logged in, don't allow to sign-up
+    if (token) {
+        logger.error('user must be logged out to continue');
+        return res.status(400).json({ message: 'user must be logged out to continue'});
+    }
 
     // validate account information
     if (!accountInformation.username || !accountInformation.password) {
