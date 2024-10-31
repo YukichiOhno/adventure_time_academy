@@ -13,9 +13,14 @@ const pinia = createPinia();
 
 pinia.use(piniaPluginPersistedstate);
 
-// Set the Axios base URL from environment variable
-axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
+
 axios.defaults.withCredentials = true;
+
+// Disable/enable console logs based on environment
+if (import.meta.env.MODE === 'production') {
+    console.log = function () {};
+    console.error = function () {};
+}
 
 app.use(pinia);
 app.use(router);

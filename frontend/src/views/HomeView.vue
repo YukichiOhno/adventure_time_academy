@@ -1,11 +1,12 @@
 <template>
 <main class="home-view">
-    <h1>Homepage</h1>
+    <NotLoggedInComponent />
 </main> 
 </template>
 
 
 <script setup>
+import NotLoggedInComponent from '@/components/Homepage/NotLoggedInComponent.vue';
 </script>
 
 

@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const { executeWriteQuery, executeReadQuery, executeTransaction } = require('../connection/pool');
 const generateCustomNumber = require('../misc/generate-number');
 const logger = require('../misc/logger');
+const authorizeToken = require('../middleware/authorize-token');
 
 router.post('/sign-up/guide', async (req, res) => {
     // initialize variables
@@ -94,7 +95,7 @@ router.post('/sign-up/guide', async (req, res) => {
 });
 
 
-router.post('/sign-up/employee', async (req, res) => {
+router.post('/sign-up/employee', authorizeToken, async (req, res) => {
     // initialize variables
     const accountInformation = req.body.account;
     const employeeInformation = req.body.employee;
@@ -104,7 +105,31 @@ router.post('/sign-up/employee', async (req, res) => {
     let accountNumber;
     let employeeNumber;
     let hashedPassword;
+    let selectQuery;
+    let resultQuery;
+    const routeUserIdentity = req.user.account_identity;
+    const routeUserNumber = req.user.account_number;
 
+    // if identity is not employee, don't let them use this route
+    if (routeUserIdentity !== "employee") {
+        return res.status(401).json({ message: "unauthorized access" });
+    }
+
+    try {
+        // if role is not administrator, refuse to allow the sign up process
+        selectQuery = "SELECT * FROM account a JOIN employee e WHERE account_number = ? and employee_role = ?";
+        resultQuery = await executeReadQuery(selectQuery, [routeUserNumber, "administrator"]);
+
+        if (resultQuery.length === 0) {
+            return res.status(400).json({ message: "no employee is assigned the administrator role"});
+        }
+
+    } catch (err) {
+        logger.error('something happened during retrieval of user identity in sign-up route')
+        logger.error(err);
+        res.status(500).json({ message: "something happened during retrieval of user identity in sign-up route", error: err});
+    }
+    
     // validate account information
     if (!accountInformation.username || !accountInformation.password) {
         logger.debug('missing username and password');
@@ -293,6 +318,29 @@ router.get('/', async (req, res) => {
         });
     }
     
+});
+
+
+router.get('/verify-token', (req, res) => {
+    const token = req.cookies['token'];
+
+    // Check if the token exists
+    if (!token) {
+        console.error('unauthorized: no token provided');
+        return res.status(401).json({ message: 'unauthorized: no token provided' });
+    }
+
+    // Verify the token
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            console.error('unauthorized: invalid token');
+            return res.status(401).json({ message: 'unauthorized: invalid token' });
+        }
+
+        // If the token is valid, respond with success
+        console.log('token is valid');
+        return res.status(200).json({ message: 'token is valid' });
+    });
 });
 
 module.exports = router;

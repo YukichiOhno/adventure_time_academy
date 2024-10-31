@@ -13,16 +13,6 @@ h4 {font-size: 1rem;}
 h5 {font-size: 0.875rem;}
 h6 {font-size: 0.75rem;}
 
-html, body {
-    block-size: 100%;
-}
-
-body {
-    /* affects header, main, and footer only */
-    display: flex;
-    flex-direction: column;
-}
-
 body > * {
     border: 1px solid black;
     border-radius: 5px;

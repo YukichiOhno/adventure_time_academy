@@ -14,8 +14,8 @@ const authorizeToken = (req, res, next) => {
         }
         
         // attach user information (acct_username, acct_id, acct_identity) to request object
-        const { acct_username, acct_id, acct_identity } = decodedToken;
-        req.user = { acct_username, acct_id, acct_identity };
+        const { account_username, account_number, account_identity } = decodedToken;
+        req.user = { account_username, account_number, account_identity };
         next();
     });
 };

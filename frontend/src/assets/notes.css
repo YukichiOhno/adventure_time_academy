@@ -1,0 +1,40 @@
+/* Mobile-first default styles - Phone vertical (320px to 480px) */
+
+/* Phone horizontal (480px and up) */
+@media (min-width: 480px) {
+    /* Styles for phones in landscape mode */
+}
+
+/* Tablet (768px and up) */
+@media (min-width: 768px) {
+/* Styles for tablets and larger phones */
+}
+
+/* Laptop (1024px and up) */
+@media (min-width: 1024px) {
+/* Styles for laptops */
+}
+
+/* Desktop PC (1440px and up) */
+@media (min-width: 1440px) {
+/* Styles for large desktops and monitors */
+}
+
+/* color palette
+*/
+
+div {
+    color: #570228;
+}
+
+div {
+    color: #f8f3ea;
+}
+
+div {
+    color: #ffdbd1;
+}
+
+div {
+    color: #fa9ebc;
+}
