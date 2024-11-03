@@ -39,7 +39,7 @@ const loginCredentials = reactive({
 const loginUser = async () => {
     try {
         let userData;
-        const response = await axios.post("http://localhost:5000/api/account/login", {
+        const response = await axios.post("/api/account/login", {
             username: loginCredentials.username,
             password: loginCredentials.password
         });

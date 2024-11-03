@@ -13,7 +13,7 @@ const pinia = createPinia();
 
 pinia.use(piniaPluginPersistedstate);
 
-
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
 axios.defaults.withCredentials = true;
 
 // Disable/enable console logs based on environment

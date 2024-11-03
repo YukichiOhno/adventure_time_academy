@@ -105,7 +105,7 @@ const signUpGuide = async () => {
         output.value = "passwords must match"
     } else {
         try {
-            const response = await axios.post('http://localhost:5000/api/account/sign-up/guide', {
+            const response = await axios.post('/api/account/sign-up/guide', {
                 account: 
                     {
                         username: guideSignUpInformation.account.username,

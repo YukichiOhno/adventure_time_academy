@@ -350,4 +350,19 @@ router.get('/verify-token', (req, res) => {
     });
 });
 
+
+router.get('/no-token', (req, res) => {
+    const token = req.cookies['token'];
+
+    // Check if the token exists
+    if (!token) {
+        console.log('no token is provided');
+        return res.status(200).json({ message: 'unauthorized: no token provided' });
+    } else {
+        return res.status(401).json({ message: 'token is provided'});
+    }
+
+    /* the entire purpose of this route is enable users to go to the login page */
+});
+
 module.exports = router;

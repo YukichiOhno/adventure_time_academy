@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
-import { useUserStore } from '@/stores/user';
 import { verifyToken } from '@/assets/misc-scripts/verify-token';
+import { noToken } from '@/assets/misc-scripts/no-token';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,11 +26,20 @@ const router = createRouter({
             name: 'login',
             component: () => import('../views/LoginView.vue'),
             beforeEnter: async (to, from, next) => {
-                const { username, identity, number } = useUserStore().userInformation;
+                try {
+                    const noTokenProvided = await noToken();
+                    console.log(`token not here?: ${noTokenProvided}`);
 
-                if (!username && !identity && !number) {
-                    next();
-                } else {
+                    if (noTokenProvided) {
+                        console.log('user does not have a verified token; therefore, they may pass the login page');
+                        next();
+                    } else {
+                        console.error('user redirect to home: you cannot access login page with an existing verified token');
+                        next({ name: 'home' });
+                    }
+                } catch (err) {
+                    console.error('an error occured while routing to login');
+                    console.error(err);
                     next({ name: 'home' });
                 }
             }

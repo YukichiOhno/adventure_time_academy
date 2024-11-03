@@ -16,7 +16,7 @@ const user = useUserStore();
 
 const logoutUser = async () => {
     try {
-        await axios.post('http://localhost:5000/api/account/logout');
+        await axios.post('/api/account/logout');
         user.resetUserInformation();
         router.push({ name: 'home' });
 

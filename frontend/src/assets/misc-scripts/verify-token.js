@@ -9,7 +9,7 @@ export const verifyToken = async () => {
   const userStore = useUserStore();
 
     try {
-        const response = await axios.get('http://localhost:5000/api/account/verify-token');
+        const response = await axios.get('/api/account/verify-token');
 
         // token is valid, return success message or true
          return response.data.message;
