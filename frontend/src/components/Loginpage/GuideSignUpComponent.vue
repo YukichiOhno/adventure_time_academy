@@ -10,7 +10,7 @@
             </li>
             <li>
                 <label for="guide-sign-up-password">password: </label>
-                <input type="password" name="guide-sign-up-password" id="guide-sign-up-password" v-model="guideSignUpInformation.account.password" required>
+                <input type="password" name="guide-sign-up-password" id="guide-sign-up-password" v-model="guideSignUpInformation.account.password" required minlength="7">
             </li>
             <li>
                 <label for="guide-sign-up-password-confirm">confirm password: </label>

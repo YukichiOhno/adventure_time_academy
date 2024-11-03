@@ -299,21 +299,48 @@ router.post('/logout', async(req, res) => {
 });
 
 
-router.get('/', async (req, res) => {
+router.get('/:account_number/:account_identity', async (req, res) => {
     let selectQuery;
     let resultQuery;
-    let accountTable;
+    let userInformation;
+    const { account_number, account_identity} = req.params;
+    logger.debug(`${account_number}, ${account_identity}`);
 
+    // throw an error if neither of these parameters are found
+    if (!account_number || !account_identity) {
+        logger.debug('account number or account identity missing');
+        return res.status(400).json({ message: 'account number or account identity missing' });
+    }
+
+    // if account identiy is neither employee nor guide, throw an error
+    if ((account_identity !== 'employee') && (account_identity !== 'guide')) {
+        logger.debug('user who is not employee nor guide is trying to access this api route');
+        return res.status(400).json({ message: 'user who is not employee nor guide is trying to access this api route' });
+    }
+    
     try {
-        // retrieve all account instances
-        selectQuery = 'SELECT account_id, account_number, account_username, account_identity FROM account;';
-        resultQuery = await executeReadQuery(selectQuery);
-        logger.debug("successfully retrieved account table's rows");
+        // retrieve an account instance based on user's account number
+        selectQuery = `SELECT * FROM account a JOIN ${account_identity} ai ON a.account_id = ai.account_id  WHERE account_number = ?;`;
+        resultQuery = await executeReadQuery(selectQuery, [account_number]);
+        
+        // if there is no result, throw an error
+        if (resultQuery.length === 0) {
+            logger.debug('user account not found');
+            return res.status(400).json({ message: 'user account not found' });
+        }
 
-        accountTable = resultQuery;
+        logger.debug("successfully retrieved account table's rows");
+        userInformation = resultQuery[0];
+
+        // remove the password and other unnecessary returned values
+        delete userInformation.account_password;
+        delete userInformation.account_identity;
+        delete userInformation.account_number;
+        delete userInformation.account_id;
+
         return res.status(200).json({ 
             message: "successfully retrieved account table's rows",
-            account: accountTable
+            account: userInformation
         });
 
     } catch (err) {

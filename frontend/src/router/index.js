@@ -49,6 +49,12 @@ const router = createRouter({
             name: 'account',
             meta: { requires_authentication: true },
             component: () => import('../views/AccountView.vue')
+        },
+        {
+            path: '/edit-account',
+            name: 'edit-account',
+            meta: { requires_authentication: true },
+            component: () => import('../views/EditAccountView.vue')
         }
     ]
 });

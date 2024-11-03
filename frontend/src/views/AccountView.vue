@@ -1,12 +1,14 @@
 <template>
 <main class="account-view">
     <h1>Account Page</h1>
+    <AccountLinksComponent />
     <button @click="logoutUser">Logout</button>
 </main>
 </template>
 
 
 <script setup>
+import AccountLinksComponent from '@/components/Accountpage/AccountLinksComponent.vue';
 import { useUserStore } from '@/stores/user';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
